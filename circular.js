@@ -13,23 +13,31 @@ const sleep = (time) => {
 }
 
 const settings = {
-  dimensions: [ 1080, 1080 ],
+  dimensions: [ 800, 800 ],
   animate:true,
-  fps:200,
+  fps:150,
 };
 
 const sketch = ({ context, width, height }) => {
 
-  const rows = 10;
-  const cols = 10;
+  const rows = 50;
+  const cols = 50;
+  const mod = 50;
   const cw =  width/rows;
   const ch =  height/cols;
   const circles = []; // 2d array of circles
   const points = []; // 2d array of points
+  let mouseX;
+  let mouseY;
+
+  window.addEventListener("mousemove", (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY; 
+  })
 
   const colors = colorMap({
-    colormap:'cubehelix', // jet, cubehelix
-    nshades:50,
+    colormap:'jet', // jet, cubehelix,viridis
+    nshades:150,
   });
 
   for(let row = 0; row < rows; row++){
@@ -38,13 +46,12 @@ const sketch = ({ context, width, height }) => {
     points.push([]);
 
     for(let col = 0; col < cols; col++){
-
       const randColor = colors[Math.floor(Math.random() * colors.length)];
+      // const randColor = colors[row +col];
       circles[row].push(new Circle((cw*2) * row, (ch*2) * col, cw, 0, Math.PI * 2));
       points[row].push(new Point(circles[row][col], randColor));
-
     }
-
+ 
   }
 
   return async ({ context, width, height, frame }) => {
@@ -58,8 +65,9 @@ const sketch = ({ context, width, height }) => {
 
       for(let col = 0; col < cols; col++){
 
-        circles[row][col].draw(context);
-        points[row][col].draw(context);
+        // circles[row][col].draw(context);
+        // points[row][col].draw(context);
+        points[row][col].initCoors();
         points[row][col].deg = row % 2 == 0 ? frame : -frame;
 
         if(prevRow == undefined || prevCol == undefined){
@@ -68,11 +76,11 @@ const sketch = ({ context, width, height }) => {
           continue;
         }
 
-        // if(prevRow != row){
-        //   continue;
-        // }
+        if(row == 0){
+          continue;
+        }
 
-        const prevPoint = points[prevRow][prevCol];
+        const prevPoint = points[row - 1][col];
         const point = points[row][col];
         let halfX;
         let halfY;
@@ -93,47 +101,57 @@ const sketch = ({ context, width, height }) => {
 
         halfY = Math.abs(((prevPoint.y - point.y) / 2)) + Math.min(point.y, prevPoint.y);
 
-        if(row > 1 && row  < 5){
+        halfX = halfX + mod * Math.cos(math.degToRad(frame));
+        halfY = halfY + mod * Math.cos(math.degToRad(frame));
 
-          if(col > 1 && col < 5){
-            context.save();
-            context.beginPath();
-            context.lineWidth = 5;
-            context.strokeStyle = "red";
-            context.arc(point.x, point.y, 5, 0, Math.PI * 2);
-            context.closePath();
-            context.stroke();
-            context.restore();
+        /*
+          Draw points for testing
+        */
+        // if(row > 1 && row  < 5){
 
-            context.save();
-            context.beginPath();
-            context.lineWidth = 5;
-            context.strokeStyle = "blue";
-            context.arc(prevPoint.x, prevPoint.y, 5, 0, Math.PI * 2);
-            context.closePath();
-            context.stroke();
-            context.restore();
+        //   if(col > 1 && col < 5){
+        //     context.save();
+        //     context.beginPath();
+        //     context.lineWidth = 5;
+        //     context.strokeStyle = "red";
+        //     context.arc(point.x, point.y, 5, 0, Math.PI * 2);
+        //     context.closePath();
+        //     context.stroke();
+        //     context.restore();
 
-            context.save();
-            context.beginPath();
-            context.lineWidth = 5;
-            context.strokeStyle = "orange";
-            context.arc(halfX, halfY, 5, 0, Math.PI * 2);
-            context.closePath();
-            context.stroke();
-            context.restore();
+        //     context.save();
+        //     context.beginPath();
+        //     context.lineWidth = 5;
+        //     context.strokeStyle = "blue";
+        //     context.arc(prevPoint.x, prevPoint.y, 5, 0, Math.PI * 2);
+        //     context.closePath();
+        //     context.stroke();
+        //     context.restore();
 
-          }
+            // context.save();
+            // context.beginPath();
+            // context.lineWidth = 5;
+            // context.strokeStyle = "orange";
+            // context.arc(halfX, halfY, 5, 0, Math.PI * 2);
+            // context.closePath();
+            // context.stroke();
+            // context.restore();
+        //   }
 
-
-        }
+        // }
 
         context.save();
+
         context.beginPath();
         context.moveTo(prevPoint.x, prevPoint.y);
+        context.globalCompositeOperation ="source-over"; // xor
         context.quadraticCurveTo(halfX,halfY,point.x,point.y);
+        // context.lineTo(mouseX, mouseY);
+        context.fillStyle = point.color;
+        context.fill();
         context.stroke();
         context.closePath();
+
         context.restore();
 
         prevRow = row;
@@ -196,13 +214,12 @@ class Point {
   draw(context){
     context.save();
 
-    let x,y;
     this.x = this.circle.x + (this.circle.radius) * Math.cos(canvasMath.degToRad(this.deg));
     this.y = this.circle.y + (this.circle.radius) * Math.sin(canvasMath.degToRad(this.deg));
 
-    context.moveTo(x,y);
+    context.moveTo(this.x,this.y);
     context.beginPath();
-    context.lineWidth = 10;
+    context.lineWidth = 0.01;
     context.fillStyle="black";
     context.arc(this.x,this.y,7,0,Math.PI * 2);
     context.fill();
@@ -210,6 +227,11 @@ class Point {
     context.stroke();
 
     context.restore();
+  }
+
+  initCoors(){
+    this.x = this.circle.x + (this.circle.radius) * Math.cos(canvasMath.degToRad(this.deg));
+    this.y = this.circle.y + (this.circle.radius) * Math.sin(canvasMath.degToRad(this.deg));
   }
 
 }
