@@ -55,26 +55,29 @@ const sketch = ({ context, width, height }) => {
  
   }
 
-  mainCircle = new Circle(width/2,height/2,width/4,0,Math.PI * 2);
+  mainCircle = new Circle(width/2,height/2,width/4,0,Math.PI * 2,20,width,height);
 
   return async ({ context, width, height, frame }) => {
 
     context.fillStyle = 'white';
     context.fillRect(0, 0, width, height);
 
+    /*
+      Draw main circle
+    */
     // context.save();
-
     context.beginPath();
     context.globalCompositeOperation ="burn"; // xor
     mainCircle.draw(context);
-    mainCircle.x = (width / 2) + Math.cos(math.radToDeg(frame / 1500)) * mod;
+    // // oscillate circle back and forth
+    // mainCircle.x = (width / 2) + Math.cos(math.radToDeg(frame / 1500)) * mod;
+    // mainCircle.y = (width / 2) + Math.sin(math.radToDeg(frame / 1500)) * mod;
     context.fillStyle = "black";
+    context.shadow
     context.fill();
     context.stroke();
     context.clip();
-
     context.closePath();
-
     // context.restore();  
 
     let prevRow = undefined;
@@ -188,12 +191,20 @@ const sketch = ({ context, width, height }) => {
 
 class Circle {
 
-  constructor(x, y, radius, startAngle, endAngle){
+  constructor(x, y, radius, startAngle, endAngle, speed = 20, cWidth = 500, cHeight = 500){
     this.x = x;
     this.y = y;
     this.radius = radius;
     this.startAngle = startAngle;
     this.endAngle = endAngle;
+    this.speed = speed;
+    this.xPolarity = 1;
+    this.yPolarity = 1;
+    this.cWidth = 500;
+    this.cHeight = 500;
+    this.xSpeed = Math.floor(Math.random() * speed) + 1;
+    this.ySpeed = Math.floor(Math.random() * speed) + 1;
+
   }
 
   draw(context){
@@ -206,6 +217,21 @@ class Circle {
     context.arc(this.x, this.y, this.radius, this.startAngle, this.endAngle);
     context.closePath();
     context.stroke();
+
+    if(this.x >= this.radius*3){
+      this.xPolarity = -1;
+    } else if (this.x <= this.radius){
+      this.xPolarity = 1;
+    } 
+
+    if(this.y >= this.radius*3){
+      this.yPolarity = -1;
+    } else if (this.y <= this.radius){
+      this.yPolarity = 1;
+    } 
+
+    this.x += this.xSpeed * this.xPolarity;
+    this.y += this.ySpeed * this.yPolarity;
 
     context.restore();
 
