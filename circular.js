@@ -26,6 +26,7 @@ const sketch = ({ context, width, height }) => {
   const cw =  width/rows;
   const ch =  height/cols;
   const circles = []; // 2d array of circles
+  let mainCircle;
   const points = []; // 2d array of points
   let mouseX;
   let mouseY;
@@ -54,10 +55,28 @@ const sketch = ({ context, width, height }) => {
  
   }
 
+  mainCircle = new Circle(width/2,height/2,width/4,0,Math.PI * 2);
+
   return async ({ context, width, height, frame }) => {
 
     context.fillStyle = 'white';
     context.fillRect(0, 0, width, height);
+
+    // context.save();
+
+    context.beginPath();
+    context.globalCompositeOperation ="burn"; // xor
+    mainCircle.draw(context);
+    mainCircle.x = (width / 2) + Math.cos(math.radToDeg(frame / 1500)) * mod;
+    context.fillStyle = "black";
+    context.fill();
+    context.stroke();
+    context.clip();
+
+    context.closePath();
+
+    // context.restore();  
+
     let prevRow = undefined;
     let prevCol = undefined;
 
