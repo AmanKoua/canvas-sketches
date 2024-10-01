@@ -51,8 +51,6 @@ const sketch = ({ context, width, height }) => {
 
     context.fillStyle = "white";
     context.fillRect(0, 0, width, height);
-    let prevRow = undefined;
-    let prevCol = undefined;
 
     for(let row = 0; row < rows; row++){
 
@@ -64,12 +62,6 @@ const sketch = ({ context, width, height }) => {
         points[row][col].deg = row % 2 == 0 ? frame : frame;
         points[row][col].deg -= (row + col) * (25 * Math.sin(math.degToRad(frame / 3)));
         points[row][col].color = colors[(row+col+Math.floor(frame/2)) % (rows + cols)];
-
-        if(prevRow == undefined || prevCol == undefined){
-          prevRow = row;
-          prevCol = col;
-          continue;
-        }
 
         if(row == 0){
           continue;
@@ -104,14 +96,14 @@ const sketch = ({ context, width, height }) => {
         // if(row > 1 && row  < 5){
 
         //   if(col > 1 && col < 5){
-        //     context.save();
-        //     context.beginPath();
-        //     context.lineWidth = 5;
-        //     context.strokeStyle = "red";
-        //     context.arc(point.x, point.y, 5, 0, Math.PI * 2);
-        //     context.closePath();
-        //     context.stroke();
-        //     context.restore();
+            // context.save();
+            // context.beginPath();
+            // context.lineWidth = 5;
+            // context.strokeStyle = "red";
+            // context.arc(point.x, point.y, 5, 0, Math.PI * 2);
+            // context.closePath();
+            // context.stroke();
+            // context.restore();
 
             // context.save();
             // context.beginPath();
@@ -128,6 +120,9 @@ const sketch = ({ context, width, height }) => {
             // context.strokeStyle = "orange";
             // context.arc(halfX, halfY, 5, 0, Math.PI * 2);
             // context.closePath();
+            // context.fillStyle = "orange";
+            // context.fill();
+
             // context.stroke();
             // context.restore();
         //   }
@@ -148,9 +143,6 @@ const sketch = ({ context, width, height }) => {
         context.closePath();
 
         context.restore();
-
-        prevRow = row;
-        prevCol = col;
 
         // await sleep(0);
 
