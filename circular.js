@@ -4,14 +4,6 @@ const random = require("canvas-sketch-util/random");
 const math = require("canvas-sketch-util/math");
 const colorMap = require("colormap");
 
-const sleep = (time) => {
-  return new Promise((res,rej) => {
-    setTimeout(()=>{
-      res();
-    },time);
-  });
-}
-
 const settings = {
   dimensions: [ 800, 800 ],
   animate:true,
@@ -68,7 +60,7 @@ const sketch = ({ context, width, height }) => {
     // context.save();
     context.beginPath();
     context.globalCompositeOperation ="burn"; // xor
-    mainCircle.draw(context);
+    mainCircle.lmaoDraw(context);
     // // oscillate circle back and forth
     // mainCircle.x = (width / 2) + Math.cos(math.radToDeg(frame / 1500)) * mod;
     // mainCircle.y = (width / 2) + Math.sin(math.radToDeg(frame / 1500)) * mod;
@@ -150,14 +142,14 @@ const sketch = ({ context, width, height }) => {
         //     context.stroke();
         //     context.restore();
 
-            // context.save();
-            // context.beginPath();
-            // context.lineWidth = 5;
-            // context.strokeStyle = "orange";
-            // context.arc(halfX, halfY, 5, 0, Math.PI * 2);
-            // context.closePath();
-            // context.stroke();
-            // context.restore();
+        //     context.save();
+        //     context.beginPath();
+        //     context.lineWidth = 5;
+        //     context.strokeStyle = "orange";
+        //     context.arc(halfX, halfY, 5, 0, Math.PI * 2);
+        //     context.closePath();
+        //     context.stroke();
+        //     context.restore();
         //   }
 
         // }
@@ -208,6 +200,21 @@ class Circle {
   }
 
   draw(context){
+
+    context.save();
+
+    context.beginPath();
+    context.lineWidth = 1;
+    context.strokeStyle = "black";
+    context.arc(this.x, this.y, this.radius, this.startAngle, this.endAngle);
+    context.closePath();
+    context.stroke();
+
+    context.restore();
+
+  }
+
+  lmaoDraw(context){
 
     context.save();
 
