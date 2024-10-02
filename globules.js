@@ -4,6 +4,11 @@ const random = require("canvas-sketch-util/random");
 const math = require("canvas-sketch-util/math");
 const colorMap = require("colormap");
 
+const colorList = ['jet', 'hsv', 'hot', 'cool', 'spring', 'summer', 'autumn', 'winter', 'bone', 'copper', 'greys', 'YIGnBu', 'greens', 'YIOrRd', 'bluered', 'RdBu', 'picnic', 'rainbow', 'portland', 'blackbody', 'earth', 'electric', 'viridis', 'inferno', 'magma', 'plasma', 'warm', 'cool', 'rainbow-soft', 'bathymetry', 'cdom', 'chlorophyll', 'density', 'freesurface-blue', 'freesurface-red', 'oxygen', 'par', 'phase', 'salinity', 'temperature', 'turbidity', 'velocity-blue', 'velocity-green', 'cubehelix'];
+const favColors = ['cool', 'spring', 'autumn', 'winter', 'bone', 'copper', 'bluered', 'blackbody', 'electric', 'warm', 'rainbow-soft', 'cubehelix'];
+
+let colorIdx = 0;
+let isUsingFavs = false;
 
 const settings = {
   dimensions: [ 1080, 1080 ],
@@ -19,8 +24,8 @@ const sketch = ({ context, width, height }) => {
   const numShades = 150;
 
   // Colors array of length numShades
-  const colors = colorMap({
-    colormap:'cubehelix', // jet,cubehelix,viridis,portland
+  let colors = colorMap({
+    colormap:"warm", // favs ['cool', 'spring', 'autumn', 'winter', 'bone', 'copper', 'bluered', 'blackbody', 'electric', 'warm', 'rainbow-soft', 'cubehelix']
     nshades:numShades,
   });
 
@@ -39,6 +44,41 @@ const sketch = ({ context, width, height }) => {
     pointPairs.push(temp);
 
   }
+
+  window.addEventListener("mousedown", (e) =>{
+
+    // which field mapping = 1:left click, 3 right click:
+  
+    if(e.which == 1 && colorIdx != colorList.length -1){
+      colorIdx++;
+    } else if (e.which == 3 && colorIdx > 0){
+      colorIdx--;
+    } else {
+      colorIdx = 0;
+      isUsingFavs = !isUsingFavs;
+    }
+
+    if(isUsingFavs){
+      console.log("---- Using favorite colors ! ----")
+      console.log(favColors[colorIdx]);
+      colors = colorMap({
+        colormap:favColors[colorIdx],
+        nshades:numShades,
+      })
+    } else{
+      console.log("---- Not using favorite colors ! ----")
+      console.log(colorList[colorIdx]);
+      colors = colorMap({
+        colormap:colorList[colorIdx],
+        nshades:numShades,
+      })
+    }
+
+    for(let i = 0; i < pointPairs.length; i++){
+      pointPairs[i].gradient = getRandomGradient(context,colors,15,width,height)
+    }
+    
+  })
 
   return ({ context, width, height }) => {
 
