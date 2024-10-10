@@ -13,7 +13,7 @@ let isUsingFavs = false;
 const settings = {
   dimensions: [ 1080, 1080 ],
   animate: true,
-  fps: 60,
+  fps:35
 };
 
 const sketch = ({ context, width, height }) => {
