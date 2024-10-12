@@ -7,6 +7,8 @@ let isLocked = false;
 let centerZ = 0;
 let centerY = 0;
 let centerX = 0;
+let rotationXPrev = 0;
+let rotationYPrev = 0;
 const width = 1024;
 const height = 1024;
 let increment = 10;
@@ -71,13 +73,18 @@ const sketch = ({ context, width, height }) => {
     context.fillStyle = 'white';
     context.fillRect(0, 0, width, height);
 
-    frame += 2000;
 
     for(let i = 0; i < circles.length; i++){
 
-      let degree = frame + ( i * ( mod*Math.sin(frame/rotationSpeedDivider) ) ); // option 1. rotation is dependent on frame and rotation speed divider
-      // let degree = frame + ( i * ( mod*Math.sin(rotationSpeedDivider) ) ); // option 2. rotation is dependent only on rotation speed divider
-      // let degree = (frame) + ( i * ( (mod + (0.3 * Math.sin(frame/100)))*Math.sin(rotationSpeedDivider) ) ); // option 3. Cool when mod value is hardcoded to an "interesting" value
+      // Frame + 2000 to skip the boring intro
+      // option 1. rotation is dependent on frame and rotation speed divider
+      let degree = frame + ( i * ( mod*Math.sin((frame+2000)/rotationSpeedDivider) ) );
+
+      //  option 2. rotation is dependent only on rotation speed divider
+      // let degree = frame + ( i * ( mod*Math.sin(rotationSpeedDivider) ) );
+
+      // option 3. Cool when mod value is hardcoded to an "interesting" value
+      // let degree = (frame) + ( i * ( (mod + (0.3 * Math.sin(frame/100)))*Math.sin(rotationSpeedDivider) ) );
 
       points[i].deg = canvasMath.degToRad(degree);
 
@@ -88,16 +95,21 @@ const sketch = ({ context, width, height }) => {
         // points[i].updatePosition();
 
         points[i].rotateX(
-          canvasMath.degToRad(2),
+          canvasMath.degToRad(3 + rotationXPrev),
           centerY, 
           centerZ
           );
 
+
+        // rotationXPrev += 2;
+
         points[i].rotateY(
-          canvasMath.degToRad(1.4),
+          canvasMath.degToRad(1.4 + rotationYPrev),
           centerX, 
           centerZ
         );
+
+        // rotationYPrev += 1.4;
 
       }
 
@@ -167,12 +179,16 @@ class Point {
     this.x = x;
     this.y = y;
     this.z = z;
+    this.x3 = 0;
+    this.y3 = 0;
+    this.z3 = 0;
     this.circle = circle;
     this.deg = 0;
   }
 
   updatePosition(){
     // Moves the x and y axes around in a spiraling circle
+    // This maps onto the 2d plane only, and ignores any 3d rotation
     this.x = (this.circle.diameter / 2) * Math.cos(this.deg);
     this.y = (this.circle.diameter / 2) * Math.sin(this.deg);
   }
