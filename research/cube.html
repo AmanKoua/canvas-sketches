@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<!-- 
+
+    All credit for this file's code goes to: Mt. Ford Studios
+
+    Original code source:
+    https://www.youtube.com/watch?v=OMA2Mwo0aZg
+    https://drive.google.com/file/d/1JYGqFOyOmspxPdsfQe46a5yPqbbPM70z/view
+
+    Linear algebra explanation:
+    Note: It gives the rotation matrices, but does not explain 
+    which axes are to be multiplies with the matrices to achieve
+    the desired rotation. For that information in particular, refer
+    to this codebase
+    https://www.cuemath.com/algebra/rotation-matrix/
+    
+-->
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cube</title>
+    <style>
+        body {
+            margin: 0;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<script>
+    // constants
+    const COLOR_BG = "black";
+    const COLOR_CUBE = "yellow";
+    const SPEED_X = 0.05; // rps
+    const SPEED_Y = 0.15; // rps
+    const SPEED_Z = 0.10; // rps
+    const POINT3D = function(x, y, z) { this.x = x; this.y = y; this.z = z; };
+
+    // set up the canvas and context
+    var canvas = document.createElement("canvas");
+    document.body.appendChild(canvas);
+    var ctx = canvas.getContext("2d");
+
+    // dimensions
+    var h = document.documentElement.clientHeight;
+    var w = document.documentElement.clientWidth;
+    canvas.height = h;
+    canvas.width = w;
+
+    // colours and lines
+    ctx.fillStyle = COLOR_BG;
+    ctx.strokeStyle = COLOR_CUBE;
+    ctx.lineWidth = w / 100;
+    ctx.lineCap = "round";
+
+    // cube parameters
+    var centerX = w / 2;
+    var centerY = h / 2;
+    var centerZ = 0;
+    var size = h / 4;
+    var vertices = [
+        new POINT3D(centerX - size, centerY - size, centerZ - size),
+        new POINT3D(centerX + size, centerY - size, centerZ - size),
+        new POINT3D(centerX + size, centerY + size, centerZ - size),
+        new POINT3D(centerX - size, centerY + size, centerZ - size),
+        new POINT3D(centerX - size, centerY - size, centerZ + size),
+        new POINT3D(centerX + size, centerY - size, centerZ + size),
+        new POINT3D(centerX + size, centerY + size, centerZ + size),
+        new POINT3D(centerX - size, centerY + size, centerZ + size)
+    ];
+    var edges = [
+        // Integer values correlate to indices in the vertices array
+        [0, 1], [1, 2], [2, 3], [3, 0], // back face
+        [4, 5], [5, 6], [6, 7], [7, 4], // front face
+        [0, 4], [1, 5], [2, 6], [3, 7] // connecting sides
+    ];
+    
+    // set up the animation loop
+    var timeDelta, timeLast = 0;
+    requestAnimationFrame(loop);
+
+    function loop(timeNow) {
+
+        // calculate the time difference
+        timeDelta = timeNow - timeLast;
+        timeLast = timeNow;
+
+        // background
+        ctx.fillRect(0, 0, w, h);
+
+        // rotate the cube along the z axis
+        // let angle = timeDelta * 0.001 * SPEED_Z * Math.PI * 2;
+        let angle = 1/100; // angle determines speed of rotation
+        for (let v of vertices) {
+            let dx = v.x - centerX; // dist from center X
+            let dy = v.y - centerY; // dist from center Y
+            // This is simply matrix multiplication with the relevant rotation matrix
+            let x = dx * Math.cos(angle) - dy * Math.sin(angle);
+            let y = dx * Math.sin(angle) + dy * Math.cos(angle);
+            v.x = x + centerX;
+            v.y = y + centerY;
+        }
+
+        // rotate the cube along the x axis
+        // angle = timeDelta * 0.001 * SPEED_X * Math.PI * 2;
+        for (let v of vertices) {
+            let dy = v.y - centerY;
+            let dz = v.z - centerZ;
+            // let y = dy * Math.cos(angle) - dz * Math.sin(angle);
+            // let z = dy * Math.sin(angle) + dz * Math.cos(angle);
+            let y = dy * Math.cos(angle) - dz * Math.sin(angle);
+            let z = dy * Math.sin(angle) + dz * Math.cos(angle);
+            v.y = y + centerY;
+            v.z = z + centerZ;
+        }
+
+        // rotate the cube along the y axis
+        // angle = timeDelta * 0.001 * SPEED_Y * Math.PI * 2;
+        for (let v of vertices) {
+            let dx = v.x - centerX;
+            let dz = v.z - centerZ;
+            let x = dz * Math.sin(angle) + dx * Math.cos(angle);
+            let z = dz * Math.cos(angle) - dx * Math.sin(angle);
+            v.x = x + centerX;
+            v.z = z + centerZ;
+        }
+
+        // draw each edge
+        for (let edge of edges) {
+            ctx.beginPath();
+            ctx.moveTo(vertices[edge[0]].x, vertices[edge[0]].y); // move to first vertex's x and y 
+            ctx.lineTo(vertices[edge[1]].x, vertices[edge[1]].y); // line to second vertex's x and y 
+            ctx.stroke();
+        }
+
+        // call the next frame
+        requestAnimationFrame(loop);
+    }
+</script>
+</body>
+</html>
