@@ -11,7 +11,7 @@ const settings = {
   fps:20
 };
 
-const sketch = ({context}) => {
+const sketch = ({}) => {
 
   const vertexCount = 400;
   const vertices = [];
@@ -20,7 +20,7 @@ const sketch = ({context}) => {
     vertices.push(new Vertex(
       scaleX(i),
       scaleY(i),
-      scaleZ(i)/4
+      scaleZ(i) - i
     ))
   }
 
@@ -32,15 +32,15 @@ const sketch = ({context}) => {
     for(let i = 0; i < vertices.length; i++){
       let degree = canvasMath.degToRad(0.7);
       vertices[i].draw(context);
-      vertices[i].rotateX(degree,height/2,0);
-      vertices[i].rotateY(degree,height/2,0)
-      vertices[i].rotateZ(degree,width/4,height/4)
+      vertices[i].rotateX(degree,height/2,0); // flip forwards and backwards
+      vertices[i].rotateY(degree,height/2,0) // rotate around object
+      vertices[i].rotateZ(degree,width/4,height/4) // tilt left and right
     }
   };
 };
 
 let scaleX = (val) =>{
-  return val;
+  return val + Math.random() * 50;
 }
 
 let scaleY = (val) => {
@@ -91,7 +91,7 @@ class Vertex {
     context.translate(width/4,height/4);
     context.beginPath();
     context.moveTo(this.x,this.y);
-    context.arc(this.x,this.y,Math.pow(2,this.z/300),0,Math.PI*2);
+    context.arc(this.x,this.y,Math.pow(2,this.z/400),0,Math.PI*2);
     context.closePath();
     context.stroke();
     context.restore();
