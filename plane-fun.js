@@ -3,6 +3,8 @@ const canvasMath = require("canvas-sketch-util/math");
 const colorMap = require("colormap");
 
 
+let isLocked = false;
+let centerZ = 0;
 const width = 1024;
 const height = 1024;
 let increment = 10;
@@ -26,7 +28,7 @@ const sketch = ({ context, width, height }) => {
   for(let i = 0; i < circleCount;i++){
     let c = new Circle(widthSlice * i);
     circles.push(c);
-    points.push(new Point(0,0,c))
+    points.push(new Point(0,0,0,c)) // Z harcoded to const atm
   }
 
   // set rotation speed divider to mouse position
@@ -41,14 +43,12 @@ const sketch = ({ context, width, height }) => {
   });
 
   document.addEventListener("mousedown", (e)=>{
-    console.log(e);
 
+    isLocked = !isLocked;
 
-    if(e.which == 1){
-      rotationSpeedDivider+=increment;
-    } 
-
-    console.log(rotationSpeedDivider);
+    // if(e.which == 1){
+    //   rotationSpeedDivider+=increment;
+    // } 
 
   })
 
@@ -70,7 +70,17 @@ const sketch = ({ context, width, height }) => {
       let degree = (frame) + ( i * ( (mod + (0.3 * Math.sin(frame/100)))*Math.sin(rotationSpeedDivider) ) ); // option 3. Cool when mod value is hardcoded to an "interesting" value
 
       points[i].deg = canvasMath.degToRad(degree);
-      points[i].updatePosition();
+
+      if(!isLocked){
+        points[i].updatePosition();
+      } else {
+        points[i].rotateX(
+          canvasMath.degToRad(3),
+           height/6, 
+          centerZ
+          );
+      }
+
       points[i].draw(context);
 
       if(i < 1){
@@ -133,9 +143,10 @@ class Circle {
 
 class Point {
 
-  constructor(x,y,circle){
+  constructor(x,y,z,circle){
     this.x = x;
     this.y = y;
+    this.z = z;
     this.circle = circle;
     this.deg = 0;
   }
@@ -144,6 +155,33 @@ class Point {
     // Moves the x and y axes around in a spiraling circle
     this.x = (this.circle.diameter / 2) * Math.cos(this.deg);
     this.y = (this.circle.diameter / 2) * Math.sin(this.deg);
+  }
+
+  rotateX(degree,centerY,centerZ){
+    let dy = this.y - centerY;
+    let dz = this.z - centerZ;
+    let y = dy * Math.cos(degree) - dz * Math.sin(degree);
+    let z = dy * Math.sin(degree) + dz * Math.cos(degree);
+    this.y = y + centerY;
+    this.z = z + centerZ;
+  }
+
+  rotateZ(degree,centerX,centerY){
+    let dx = this.x - centerX; // dist from center X
+    let dy = this.y - centerY; // dist from center Y
+    let x = dx * Math.cos(degree) - dy * Math.tan(degree);
+    let y = dx * Math.sin(degree) + dy * Math.cos(degree);
+    this.x = x + centerX; // The circle is rotated about the center of the canvas
+    this.y = y + centerY;
+  }
+
+  rotateY(degree,centerX,centerZ){
+    let dx = this.x - centerX;
+    let dz = this.z - centerZ;
+    let x = dz * Math.sin(degree) + dx * Math.cos(degree);
+    let z = dz * Math.cos(degree) - dx * Math.sin(degree);
+    this.x = x + centerX;
+    this.z = z + centerZ;
   }
 
   draw(context){
