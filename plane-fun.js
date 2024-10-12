@@ -5,6 +5,8 @@ const colorMap = require("colormap");
 
 let isLocked = false;
 let centerZ = 0;
+let centerY = 0;
+let centerX = 0;
 const width = 1024;
 const height = 1024;
 let increment = 10;
@@ -21,7 +23,7 @@ const sketch = ({ context, width, height }) => {
 
   const circleCount = 900;
   const mod = 50; // 50
-  const widthSlice = width / circleCount;
+  const widthSlice = (width/1.4) / circleCount;
   const circles = [];
   const points = [];
 
@@ -35,6 +37,12 @@ const sketch = ({ context, width, height }) => {
   // document.addEventListener("mousemove", (e)=>{
   //   rotationSpeedDivider = e.clientX * 10;
   //   console.log(rotationSpeedDivider);
+  // })
+
+  // Set centerZ to mouse position
+  // document.addEventListener("mousemove", (e)=>{
+  //   centerY = e.clientX;
+  //   console.log(centerY);
   // })
 
   const colors = colorMap({
@@ -63,22 +71,34 @@ const sketch = ({ context, width, height }) => {
     context.fillStyle = 'white';
     context.fillRect(0, 0, width, height);
 
+    frame += 2000;
+
     for(let i = 0; i < circles.length; i++){
 
-      // let degree = frame + ( i * ( mod*Math.sin(frame/rotationSpeedDivider) ) ); // option 1. rotation is dependent on frame and rotation speed divider
+      let degree = frame + ( i * ( mod*Math.sin(frame/rotationSpeedDivider) ) ); // option 1. rotation is dependent on frame and rotation speed divider
       // let degree = frame + ( i * ( mod*Math.sin(rotationSpeedDivider) ) ); // option 2. rotation is dependent only on rotation speed divider
-      let degree = (frame) + ( i * ( (mod + (0.3 * Math.sin(frame/100)))*Math.sin(rotationSpeedDivider) ) ); // option 3. Cool when mod value is hardcoded to an "interesting" value
+      // let degree = (frame) + ( i * ( (mod + (0.3 * Math.sin(frame/100)))*Math.sin(rotationSpeedDivider) ) ); // option 3. Cool when mod value is hardcoded to an "interesting" value
 
       points[i].deg = canvasMath.degToRad(degree);
 
       if(!isLocked){
         points[i].updatePosition();
       } else {
+
+        // points[i].updatePosition();
+
         points[i].rotateX(
-          canvasMath.degToRad(3),
-           height/6, 
+          canvasMath.degToRad(2),
+          centerY, 
           centerZ
           );
+
+        points[i].rotateY(
+          canvasMath.degToRad(1.4),
+          centerX, 
+          centerZ
+        );
+
       }
 
       points[i].draw(context);
@@ -94,7 +114,7 @@ const sketch = ({ context, width, height }) => {
       context.beginPath();
       context.moveTo(points[i-1].x, points[i-1].y); // Very cool if disabled
       context.lineTo(points[i].x, points[i].y); // Standard behavior
-      // context.quadraticCurveTo(500*Math.sin(canvasMath.degToRad(frame*2)),0,points[i].x, points[i].y) // alternative to lineTo and moveTo
+      // context.quadraticCurveTo(0,0,points[i].x, points[i].y) // alternative to lineTo and moveTo
 
       // context.strokeStyle="black";
       // context.strokeStyle = colors[ // makeshift distance formula
