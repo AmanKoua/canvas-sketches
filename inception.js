@@ -12,7 +12,7 @@ const settings = {
 
 const sketch = () => {
 
-  const numPoints = 70;
+  const numPoints = 700;
   const points = [];
   const circle = new Circle(width);
 
@@ -26,8 +26,8 @@ const sketch = () => {
     context.fillRect(0, 0, width, height);
 
     for(let i = 0; i < numPoints; i++){
-      points[i].x = Math.cos(canvasMath.degToRad(frame * (i / 100))) * points[i].circle.diameter / 2 ;
-      points[i].y = Math.sin(canvasMath.degToRad(frame * (2 - (i / 100)))) * points[i].circle.diameter / 2;
+      points[i].x = Math.cos(canvasMath.degToRad(frame * (i / 20))) * points[i].circle.diameter / 2 ;
+      points[i].y = Math.sin(canvasMath.degToRad(frame * (2 - (i / 5)))) * points[i].circle.diameter / 2;
       points[i].draw(context);
 
       if(i == 0){
