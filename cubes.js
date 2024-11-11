@@ -3,8 +3,8 @@ const canvasSketch = require('canvas-sketch');
 const HEIGHT = 1000;
 const WIDTH = 1000;
 const maxSpeed = 10;
-const ROWS = 10;
-const COLS = 10;
+const ROWS = 13;
+const COLS = 13;
 const ROW_HEIGHT = HEIGHT / ROWS;
 const COL_WIDTH = WIDTH / COLS;
 
@@ -25,8 +25,8 @@ const sketch = () => {
     for(let col = 0; col < COLS; col++){
 
       const point = new Point(
-        maxSpeed/(row+col),
-        maxSpeed/(row+col),
+        maxSpeed/row,
+        maxSpeed/col,
         (col*COL_WIDTH) + (COL_WIDTH / 2),
         (row*ROW_HEIGHT) + (ROW_HEIGHT / 2),
         row,
