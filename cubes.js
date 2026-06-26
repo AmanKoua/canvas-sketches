@@ -3,8 +3,8 @@ const canvasSketch = require('canvas-sketch');
 const HEIGHT = 1000;
 const WIDTH = 1000;
 const maxSpeed = 10;
-const ROWS = 13;
-const COLS = 13;
+const ROWS = 20;
+const COLS = 20;
 const ROW_HEIGHT = HEIGHT / ROWS;
 const COL_WIDTH = WIDTH / COLS;
 
