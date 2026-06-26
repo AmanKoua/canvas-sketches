@@ -23,16 +23,18 @@ const settings = {
 
 const sketch = ({ context, width, height }) => {
 
-  const circleCount = 900;
+  const circleCount = 800;
   const mod = 50; // 50
   const widthSlice = (width/1.4) / circleCount;
   const circles = [];
   const points = [];
+  const points2 = [];
 
   for(let i = 0; i < circleCount;i++){
     let c = new Circle(widthSlice * i);
     circles.push(c);
     points.push(new Point(0,0,0,c)) // Z harcoded to const atm
+    points2.push(new Point(0,0,-300,c)) // Z harcoded to const atm
   }
 
   // set rotation speed divider to mouse position
@@ -87,9 +89,11 @@ const sketch = ({ context, width, height }) => {
       let degree = (frame) + ( i * ( (mod + (0.3 * Math.sin(frame/100)))*Math.sin(rotationSpeedDivider) ) );
 
       points[i].deg = canvasMath.degToRad(degree);
+      points2[i].deg = canvasMath.degToRad(degree);
 
       if(!isLocked){
         points[i].updatePosition();
+        points2[i].updatePosition();
       } else {
 
         // points[i].updatePosition();
@@ -100,10 +104,22 @@ const sketch = ({ context, width, height }) => {
           centerZ
           );
 
+        points2[i].rotateX(
+          canvasMath.degToRad(3 + rotationXPrev),
+          centerY, 
+          centerZ
+        );
+
 
         // rotationXPrev += 2;
 
         points[i].rotateY(
+          canvasMath.degToRad(1.4 + rotationYPrev),
+          centerX, 
+          centerZ
+        );
+
+        points2[i].rotateY(
           canvasMath.degToRad(1.4 + rotationYPrev),
           centerX, 
           centerZ
@@ -114,6 +130,7 @@ const sketch = ({ context, width, height }) => {
       }
 
       points[i].draw(context);
+      points2[i].draw(context);
 
       if(i < 1){
         continue;
@@ -138,6 +155,12 @@ const sketch = ({ context, width, height }) => {
       //   Math.floor(dist)
       // ];
 
+      context.stroke();
+      context.closePath();
+
+      context.beginPath();
+      context.moveTo(points2[i-1].x, points2[i-1].y); // Very cool if disabled
+      context.lineTo(points2[i].x, points2[i].y); // Standard behavior
       context.stroke();
       context.closePath();
 
